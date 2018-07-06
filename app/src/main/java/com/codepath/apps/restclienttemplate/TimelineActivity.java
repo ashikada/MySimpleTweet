@@ -1,10 +1,13 @@
 package com.codepath.apps.restclienttemplate;
 
-import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.codepath.apps.restclienttemplate.models.Tweet;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -12,17 +15,55 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
-public class TimelineActivity extends Activity {
+public class TimelineActivity extends AppCompatActivity {
 
     private TwitterClient client;
     TweetAdapter tweetAdapter;
     ArrayList<Tweet> tweets;
     RecyclerView rvTweets;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.action_item_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case R.id.miCompose:
+                onComposeAction();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == 20 && resultCode == RESULT_OK) {
+            Tweet t = Parcels.unwrap(data.getParcelableExtra("mode"));
+            tweets.add(0, t);
+            tweetAdapter.notifyItemInserted(0);
+            rvTweets.scrollToPosition(0);
+        }
+    }
+
+    public void onComposeAction(){
+
+        Intent i = new Intent(TimelineActivity.this, ComposeActivity.class);
+        startActivityForResult(i, 20);
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +89,9 @@ public class TimelineActivity extends Activity {
 
         populateTimeline();
 
+
     }
+
 
     private void populateTimeline(){
         //make the network request to get data from Twitter api

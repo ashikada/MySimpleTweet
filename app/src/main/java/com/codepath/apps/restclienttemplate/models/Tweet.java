@@ -2,8 +2,16 @@ package com.codepath.apps.restclienttemplate.models;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.parceler.Parcel;
 
+
+@Parcel
 public class Tweet {
+
+    public Tweet(){
+
+    }
+
 //    list out the attributes
     public String body;
     public long uid;        //database ID for the tweet
